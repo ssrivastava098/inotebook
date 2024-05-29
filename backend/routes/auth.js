@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken'); //Required for JWT Tokens
 const { check, validationResult } = require('express-validator'); //Required for validation of the inputs coming in the request
 
 
-const pepper = '00--00'; //Adding Pepper for extra security same for all the users not stored in database
+const pepper = process.env.PEPPER; //Adding Pepper for extra security same for all the users not stored in database
 const jwtSecret = process.env.JWT_SECRET; //Secret JWT string coming from environment variable
 
 //Create a USer using: POST "app/auth/". Doesn't require you to login
@@ -31,7 +31,7 @@ router.post("/createUser", [
         }
         //if it is a new email then carry on adding the users with hashed password
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password + salt + pepper, 10);
+        const hashedPassword = await bcrypt.hash(password + pepper, salt);
         //Actually adding the name email and hashed password
         const newUser = await User.create({ name, email, "password":hashedPassword });
         //this the payload that will be given as response to the client on successfully adding of an user
@@ -53,6 +53,47 @@ router.post("/createUser", [
         res.status(500).json({ message: error.message });
     }
 
+})
+
+//Authenticate a User using: POST "app/auth/login". Doesn't require you to login
+router.post("/login", [
+    // Validation rules
+    check('email', 'Please include a valid email').isEmail(),
+    check('password','password can\'t be blank').exists()
+], async (req, res) => {
+    const errors = validationResult(req);
+    //Checking for validation errors 
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    //if no errors in data then do the following
+    try {
+        const {email, password } = req.body;
+        const user_login = await User.findOne({ email });
+        console.log(user_login.password)
+        //if you don't find an email then abort logging in
+        if (!user_login) {
+            return res.status(400).json({ message: "Invalid Credentials" });
+        }
+        const comparePassword = await bcrypt.compare(password+pepper,user_login.password);
+        if(!comparePassword)
+            {
+                return res.status(400).json({ message: "Invalid Credentials" });
+            }
+        const payload = {
+            user: {
+                id: user_login.id
+            }
+        };
+
+        jwt.sign(payload, jwtSecret, { expiresIn: '1h' }, (err, token) => {
+            if (err) throw err;
+            res.json({ token });
+        });
+    }
+    catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 })
 
 module.exports = router;
