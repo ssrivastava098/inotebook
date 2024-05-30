@@ -4,12 +4,13 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt'); //Required for Hashing, Salt and Pepper process
 const jwt = require('jsonwebtoken'); //Required for JWT Tokens
 const { check, validationResult } = require('express-validator'); //Required for validation of the inputs coming in the request
+const fetchUser = require('../middlewares/fetchUser')
 
 
 const pepper = process.env.PEPPER; //Adding Pepper for extra security same for all the users not stored in database
 const jwtSecret = process.env.JWT_SECRET; //Secret JWT string coming from environment variable
 
-//Create a USer using: POST "app/auth/". Doesn't require you to login
+//Route 1:-Create a USer using: POST "app/auth/". Doesn't require you to login
 router.post("/createUser", [
     // Validation rules
     check('name', 'Name is required').not().isEmpty(),
@@ -55,7 +56,7 @@ router.post("/createUser", [
 
 })
 
-//Authenticate a User using: POST "app/auth/login". Doesn't require you to login
+//Route 2:-Authenticate a User using: POST "app/auth/login". Doesn't require you to login
 router.post("/login", [
     // Validation rules
     check('email', 'Please include a valid email').isEmail(),
@@ -95,5 +96,19 @@ router.post("/login", [
         res.status(500).json({ message: error.message });
     }
 })
+
+//Route 3:- Get Logged in User Details using: POST "app/auth/getuser". Login Requires
+router.post("/getUser", fetchUser, async (req, res) => {
+try {
+    //Here we will like to write a logic to extract the userID from JWT token received on logging
+    const userId = req.user.id;
+    //Here we are fetching the details from the database based on the id extracted from JWT token. All the fields except 'password' is returned here
+    const user = await User.findById(userId).select("-password");
+    res.send(user);
+} catch (error) {
+    res.status(500).json({ message: error.message });
+}
+})
+
 
 module.exports = router;
