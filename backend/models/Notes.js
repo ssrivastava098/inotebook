@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 
 // Create a schema for the Note
 const NoteSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user_collections',
+        required: true,
+    }, //This is added to associate notes with an individual user only so that other user aren't able to read their notes
     title: {
         type: String,
         required: true,
