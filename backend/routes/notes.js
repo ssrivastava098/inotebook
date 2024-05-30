@@ -70,4 +70,27 @@ router.put("/updateNotes/:id",fetchUser,
         }
 })
 
+//Route 4: This will delete an existing note of a logged in user DELETE : "/app/notes/deleteNotes" Login Required
+//Here we need to pass the noteID which needs to be deleted and also need to authenticate that only a valid user is able to delete his/her notes
+router.delete("/deleteNotes/:id",fetchUser,
+    // Validation is not required,
+     async(req, res) => {
+        try {
+            //First need to validate the user
+            //Find the node to be deleted
+            const deleteNote = await Notes.findById(req.params.id);
+            if (!deleteNote) {
+                return res.status(404).send("Not Found");
+            }
+            if (deleteNote.user.toString() !== req.user.id) {
+                return res.status(401).send("Not Allowed");
+            }
+            const note = await Notes.findByIdAndDelete(req.params.id)
+            res.json({ "Success": "Note has been deleted", note : note });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+})
+
+
 module.exports = router;
