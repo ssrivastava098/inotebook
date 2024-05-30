@@ -41,4 +41,33 @@ router.post("/addANote",fetchUser,[
         res.status(500).json({ message: error.message });
     }
 })
+
+//Route 3: This will update an existing note of a logged in user PUT : "/app/notes/updateNotes" Login Required
+//Here we need to pass the noteID which needs to be changed and also need to authenticate that only a valid user is able to update his/her notes
+router.put("/updateNotes/:id",fetchUser,
+    // Validation is not required,
+     async(req, res) => {
+        try {
+            const {title, description, tag}= req.body;
+            const newNote = {};
+            if (title) { newNote.title = title; }
+            if (description) { newNote.description = description; }
+            if (tag) { newNote.tag = tag; }
+
+            //First need to validate the user
+            //Find the node to be replaced
+            const replaceNote = await Notes.findById(req.params.id);
+            if (!replaceNote) {
+                return res.status(404).send("Not Found");
+            }
+            if (replaceNote.user.toString() !== req.user.id) {
+                return res.status(401).send("Not Allowed");
+            }
+            const note = await Notes.findByIdAndUpdate(req.params.id, { $set: newNote }, { new: true })
+            res.json({ note });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+})
+
 module.exports = router;
