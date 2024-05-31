@@ -3,18 +3,22 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar'
 import Home from './components/Home';
 import About from './components/About';
+import NoteState from './contexts/notes/noteState';
 
 function App() {
   return (
-    <>
+    //This binding of the entire segment in <NoteState> will allow all the components to use the state variables
+    <NoteState>
       <Router>
         <Navbar />
-        <Routes>
-          <Route exact path="/" element={<Home />} />
-          <Route exact path="/about" element={<About />} />
-        </Routes>
+        <div className="container">
+          <Routes>
+            <Route exact path="/" element={<Home />} />
+            <Route exact path="/about" element={<About />} />
+          </Routes>
+        </div>
       </Router>
-    </>
+    </NoteState>
   );
 }
 
