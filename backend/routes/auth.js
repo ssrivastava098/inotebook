@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
@@ -9,6 +10,7 @@ const fetchUser = require('../middlewares/fetchUser')
 
 const pepper = process.env.PEPPER; //Adding Pepper for extra security same for all the users not stored in database
 const jwtSecret = process.env.JWT_SECRET; //Secret JWT string coming from environment variable
+console.log(jwtSecret)
 
 //Route 1:-Create a USer using: POST "app/auth/". Doesn't require you to login
 router.post("/createUser", [
@@ -44,7 +46,7 @@ router.post("/createUser", [
                 id: newUser.id
             }
         };
-
+        console.log(payload);
         jwt.sign(payload, jwtSecret, { expiresIn: '1h' }, (err, token) => {
             if (err) throw err;
             res.json({ token });
