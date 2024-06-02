@@ -9,6 +9,9 @@ body {
   background-attachment: fixed;
 }
 
+.close-right {
+  margin-left: auto;
+}
 
 .comfortaa {
   font-family: "Comfortaa", sans-serif;
@@ -18,7 +21,7 @@ body {
 }
 
 .i{
-  curser : pointer;
+  cursor  : pointer;
 }
 
 .App {
