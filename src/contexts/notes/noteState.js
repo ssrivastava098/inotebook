@@ -3,25 +3,34 @@
 
 import { useState } from "react";
 import noteContext from "./noteContext";
+import { useContext } from 'react'
+import authContext from "../auth/authContext"
 
 const NoteState = (props) => {
   const host = "http://localhost:5000";
   // const notesIntital = []
   const [notes, setNotes] = useState([])
-
+  const context = useContext(authContext);
+  const {token} = context;
+  // console.log(token)
   
   
   const fetchAllNotes = async() => {
-    const response = await fetch(`${host}/app/notes/fetchAllNotes`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjY1YWZkNTRjYTIwNGM2ODcxNWEwMTgwIn0sImlhdCI6MTcxNzM1MDYxOCwiZXhwIjoxNzE3MzU0MjE4fQ.hlvv-MV98dzwSqhBnbzOisPWXLo1q4REyg6bWxWTAP0'
-      }
-    });
-    const res = await response.json()
-    // console.log(res);
-    setNotes(res);
+    try {
+      const response = await fetch(`${host}/app/notes/fetchAllNotes`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'auth-token': token
+        }
+      });
+      const res = await response.json()
+      // console.log(res);
+      setNotes(res);
+    } catch (error) {
+      // console.error('Failed to fetch notes:', error);
+    }
+    
   }
 
   //Add a Note
@@ -36,7 +45,7 @@ const NoteState = (props) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjY1YWZkNTRjYTIwNGM2ODcxNWEwMTgwIn0sImlhdCI6MTcxNzM1MDYxOCwiZXhwIjoxNzE3MzU0MjE4fQ.hlvv-MV98dzwSqhBnbzOisPWXLo1q4REyg6bWxWTAP0'
+        'auth-token': token
       },
       body: JSON.stringify(data)
     });
@@ -56,7 +65,7 @@ const NoteState = (props) => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjY1YWZkNTRjYTIwNGM2ODcxNWEwMTgwIn0sImlhdCI6MTcxNzM1MDYxOCwiZXhwIjoxNzE3MzU0MjE4fQ.hlvv-MV98dzwSqhBnbzOisPWXLo1q4REyg6bWxWTAP0'
+        'auth-token': token
       },
       body: JSON.stringify(data)
     });
@@ -78,7 +87,7 @@ const NoteState = (props) => {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'auth-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjY1YWZkNTRjYTIwNGM2ODcxNWEwMTgwIn0sImlhdCI6MTcxNzM1MDYxOCwiZXhwIjoxNzE3MzU0MjE4fQ.hlvv-MV98dzwSqhBnbzOisPWXLo1q4REyg6bWxWTAP0'
+        'auth-token': token
       },
     });
     console.log(response.json());

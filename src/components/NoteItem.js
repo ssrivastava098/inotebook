@@ -2,10 +2,11 @@ import React, { useContext, useState} from 'react';
 import noteContext from "../contexts/notes/noteContext";
 
 const formatDate = (dateString) => {
-    const dateObj = new Date(dateString);
-    if (isNaN(dateObj.getTime())) {
-        throw new RangeError('Invalid time value');
-    }
+    try {
+        const dateObj = new Date(dateString);
+    // if (isNaN(dateObj.getTime())) {
+    //     throw new RangeError('Invalid time value');
+    // }
     const options = {
         year: 'numeric',
         month: 'long',
@@ -18,6 +19,10 @@ const formatDate = (dateString) => {
     };
     const formattedDate = new Intl.DateTimeFormat('en-US', options).format(dateObj);
     return formattedDate;
+    } catch (error) {
+        console.log(error);
+    }
+    
 }
 
 const NoteItem = (props) => {

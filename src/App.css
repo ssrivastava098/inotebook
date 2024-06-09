@@ -8,7 +8,10 @@ body {
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
-
+.readability
+{
+  background-color: rgba(0, 0, 0, 0.5);
+}
 .close-right {
   margin-left: auto;
 }

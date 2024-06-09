@@ -17,8 +17,8 @@ const AddANote = () => {
     }
     return (
         <div>
-            <h1 className='text-center'>Enter your Notes</h1>
-            <div className="container my-3">
+            <h1 className='container text-center readability'>Enter your Notes</h1>
+            <div className="container my-3 readability">
                 <form onSubmit={handleSubmit}>
                     <div className="row mb-3">
                         <label htmlFor="title" className="col-sm-2 col-form-label">Title</label>

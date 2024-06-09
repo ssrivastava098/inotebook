@@ -19,10 +19,11 @@ router.post("/createUser", [
     check('email', 'Please include a valid email').isEmail(),
     check('password', 'Password must be at least 6 characters').isLength({ min: 6 })
 ], async (req, res) => {
+    let success = false;
     const errors = validationResult(req);
     //Checking for validation errors 
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({success: success, errors: errors.array() });
     }
     //if no errors in data then do the following
     try {
@@ -30,7 +31,7 @@ router.post("/createUser", [
         const existingUser = await User.findOne({ email });
         //if you find a same email then abort adding
         if (existingUser) {
-            return res.status(400).json({ message: 'User already exists' });
+            return res.status(400).json({success: success, message: 'User already exists' });
         }
         //if it is a new email then carry on adding the users with hashed password
         const salt = await bcrypt.genSalt(10);
@@ -49,11 +50,12 @@ router.post("/createUser", [
         console.log(payload);
         jwt.sign(payload, jwtSecret, { expiresIn: '1h' }, (err, token) => {
             if (err) throw err;
-            res.json({ token });
+            success = true;
+            res.json({success: success, token });
         });
     }
     catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({success: success, message: error.message });
     }
 
 })
@@ -64,10 +66,11 @@ router.post("/login", [
     check('email', 'Please include a valid email').isEmail(),
     check('password','password can\'t be blank').exists()
 ], async (req, res) => {
+    let success = false;
     const errors = validationResult(req);
     //Checking for validation errors 
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ success: success , errors: errors.array() });
     }
     //if no errors in data then do the following
     try {
@@ -76,12 +79,12 @@ router.post("/login", [
         console.log(user_login.password)
         //if you don't find an email then abort logging in
         if (!user_login) {
-            return res.status(400).json({ message: "Invalid Credentials" });
+            return res.status(400).json({success: success , message: "Invalid Credentials" });
         }
         const comparePassword = await bcrypt.compare(password+pepper,user_login.password);
         if(!comparePassword)
             {
-                return res.status(400).json({ message: "Invalid Credentials" });
+                return res.status(400).json({success: success , message: "Invalid Credentials" });
             }
         const payload = {
             user: {
@@ -89,13 +92,14 @@ router.post("/login", [
             }
         };
 
-        jwt.sign(payload, jwtSecret, { expiresIn: '1h' }, (err, token) => {
+        jwt.sign(payload, jwtSecret, { expiresIn: '2h' }, (err, token) => {
             if (err) throw err;
-            res.json({ token });
+            success = true;
+            res.json({success: success , token });
         });
     }
     catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({success: success , message: error.message });
     }
 })
 
